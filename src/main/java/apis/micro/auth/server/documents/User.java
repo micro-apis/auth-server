@@ -12,10 +12,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
-@Document
 @Getter
 @Setter
 @Accessors(chain = true)
+@Document(collection = "users")
 public class User implements Persistable<String> {
 
     @Id
@@ -33,7 +33,7 @@ public class User implements Persistable<String> {
 
     private Boolean enabled;
 
-    @DBRef(db = "Role", lazy = true)
+    @DBRef(db = "roles", lazy = true)
     private Role role;
 
     @Override

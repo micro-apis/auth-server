@@ -9,6 +9,13 @@ mongo
       }
     )
 
+3. db.grantRolesToUser(
+       "root",
+       [
+         { role: "readWrite", db: "auth_server" }
+       ]
+    )
+
 
 
 open cmd with admin level access
