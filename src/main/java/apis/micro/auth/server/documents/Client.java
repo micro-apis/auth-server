@@ -7,7 +7,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -16,16 +15,20 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Accessors(chain = true)
-@Document(collection = "users")
-public class User implements Persistable<String> {
+@Document(collection = "clients")
+public class Client implements Persistable {
 
     @Id
     private String id;
 
-    @Field("username")
-    private String userName;
+    @Field("client_id")
+    private String clientId;
 
-    private String password;
+    @Field("client_secret")
+    private String clientSecret;
+
+    @Field("token_validity")
+    private LocalDateTime tokenValidity;
 
     @CreatedDate
     private LocalDateTime created;
@@ -36,12 +39,6 @@ public class User implements Persistable<String> {
     private Boolean deleted;
 
     private Boolean enabled;
-
-    @DBRef(db = "roles", lazy = true)
-    private Role role;
-
-    @DBRef(db = "userProfiles", lazy = true)
-    private UserProfile userProfile;
 
     @Override
     public boolean isNew() {
