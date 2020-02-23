@@ -6,16 +6,17 @@ import lombok.experimental.Accessors;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Document
 @Getter
 @Setter
 @Accessors(chain = true)
-public class User {
+public class User implements Persistable<String> {
 
     @Id
     private String id;
@@ -31,4 +32,15 @@ public class User {
     private Boolean deleted;
 
     private Boolean enabled;
+
+    @DBRef(db = "Role", lazy = true)
+    private Role role;
+
+    @Override
+    public boolean isNew() {
+        if(getCreated() == null)
+            return true;
+        else
+            return false;
+    }
 }
