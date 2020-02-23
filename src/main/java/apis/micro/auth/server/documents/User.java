@@ -9,6 +9,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
 
@@ -20,7 +21,10 @@ public class User implements Persistable<String> {
 
     @Id
     private String id;
+
+    @Field("username")
     private String userName;
+
     private String password;
 
     @CreatedDate
