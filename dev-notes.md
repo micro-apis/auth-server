@@ -23,17 +23,17 @@ id  |  client_id   |    client_secret (encrypt, Bcrypt)   |    token_validity   
 
 users
 
-id  |  username   |    password (encrypt, Bcrypt)  | created | updated |  enabled | deleted | role_id
+id  |  username   |    password (encrypt, Bcrypt)  | created | updated |  enabled | deleted | role_id |  user_profile_id
 
 
 roles
 
-id | role_name | ....
+id | role_name | created | updated | enabled | deleted 
 
 
 user_profile
 
-id | user_id | fname | lname | gender | .....
+id | fname | lname | gender | created | updated | deleted
 
 
 -------- JWT --------------

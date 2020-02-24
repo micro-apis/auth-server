@@ -16,16 +16,19 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Accessors(chain = true)
-@Document(collection = "users")
-public class User implements Persistable<String> {
+@Document(collection = "user_profile")
+public class UserProfile implements Persistable {
 
     @Id
     private String id;
 
-    @Field("username")
-    private String userName;
+    @Field("first_name")
+    private String firstName;
 
-    private String password;
+    @Field("last_name")
+    private String lastName;
+
+    private String gender;
 
     @CreatedDate
     private LocalDateTime created;
@@ -34,14 +37,6 @@ public class User implements Persistable<String> {
     private LocalDateTime updated;
 
     private Boolean deleted;
-
-    private Boolean enabled;
-
-    @DBRef(db = "roles", lazy = true)
-    private Role role;
-
-    @DBRef(db = "userProfiles", lazy = true)
-    private UserProfile userProfile;
 
     @Override
     public boolean isNew() {
