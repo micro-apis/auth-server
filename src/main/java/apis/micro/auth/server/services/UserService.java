@@ -31,25 +31,30 @@ public class UserService {
                 .setRoleName("user")
                 .setDeleted(false)
                 .setEnabled(true);
-        Mono<Role> roleMono = roleRepository.save(role);
+        //Mono<Role> roleMono = roleRepository.save(role);
 
         UserProfile userProfile = new UserProfile()
                 .setFirstName("Diway")
                 .setLastName("Sanu")
                 .setGender("Male")
                 .setDeleted(false);
-        Mono<UserProfile> userProfileMono = userProfileRepository.save(userProfile);
+        //Mono<UserProfile> userProfileMono = userProfileRepository.save(userProfile);
 
         User user = new User();
         user.setUserName("diway@gmail.com")
                 .setPassword(passwordEncoder.encode("Test1234"))
                 .setDeleted(false)
-                .setEnabled(true)
-                .setRole(roleMono.block())
-                .setUserProfile(userProfileMono.block());
+                .setEnabled(true);
+                //.setRole(roleMono.block())
+                //.setUserProfile(userProfileMono.block());
 
         Mono<User> userMono = userRepository.save(user);
 
         return userMono;
+    }
+
+    public Mono<User> getUser(String username) {
+
+        return userRepository.findByUserName(username);
     }
 }

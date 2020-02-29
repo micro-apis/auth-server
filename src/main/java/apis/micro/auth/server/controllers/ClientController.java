@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 @RestController
-public class Clientcontroller {
+public class ClientController {
 
     @Autowired
     ClientService clientService;
