@@ -10,10 +10,17 @@ import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.spec.RSAPublicKeySpec;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
+/*
+This class have been extracted from org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
+library: spring-security-oauth2
+ */
 public class KeyStoreKeyFactory {
-   private static final Log logger = LogFactory.getLog(KeyStoreKeyFactory.class);
+   private final Logger logger = LoggerFactory.getLogger(KeyStoreKeyFactory.class);
+
    private Resource resource;
    private char[] password;
    private KeyStore store;

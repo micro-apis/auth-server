@@ -1,10 +1,8 @@
-package apis.micro.auth.server.utils;
+package apis.micro.auth.server.services;
 
 import apis.micro.auth.server.documents.User;
 import apis.micro.auth.server.services.UserService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,6 +14,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+
+import static io.jsonwebtoken.Header.TYPE;
+import static io.jsonwebtoken.Header.JWT_TYPE;
+import static io.jsonwebtoken.JwsHeader.KEY_ID;
 
 @Service
 public class JwtService {
@@ -57,6 +59,11 @@ public class JwtService {
         return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
     }
 
+    // TODO catch all JwtParser Runtime exceptions
+    public Claims extractMyClaims(String token) {
+        return Jwts.parser().setSigningKey(keyPair.getPublic()).parseClaimsJws(token).getBody();
+    }
+
     private Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
@@ -67,11 +74,20 @@ public class JwtService {
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
+        // Header header = Jwts.jwsHeader().setKeyId("default-key-id");
+        Map<String, Object> headerMap = new HashMap<>();
+        headerMap.put(KEY_ID, "default-key-id");
+        headerMap.put(TYPE, JWT_TYPE);
 
-        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(subject)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
-                .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate()).compact();
+                .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate())
                 //.signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();  // This is for Symmetric KeyPair
+                .setHeader(headerMap)
+                .compact();
     }
 
     public Boolean validateToken(String token, User userDetails) {

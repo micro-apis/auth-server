@@ -1,6 +1,6 @@
 package apis.micro.auth.server.configs;
 
-import apis.micro.auth.server.utils.JksUtil;
+import apis.micro.auth.server.utils.KeyStoreUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +16,7 @@ public class JwtConfig {
 
     @Bean(name = "defaultKeyPair")
     public KeyPair defaultKeyPair() {
-        return JksUtil
+        return KeyStoreUtil
                 .jwtKeyPair(
                         environment.getProperty("DEFAULT_JWT_JKS_PATH"),
                         environment.getProperty("DEFAULT_JWT_JKS_PASS"),
