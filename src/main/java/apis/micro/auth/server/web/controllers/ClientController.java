@@ -1,4 +1,4 @@
-package apis.micro.auth.server.controllers;
+package apis.micro.auth.server.web.controllers;
 
 import apis.micro.auth.server.documents.Client;
 import apis.micro.auth.server.services.ClientService;

@@ -1,8 +1,9 @@
 package apis.micro.auth.server.services;
 
 import apis.micro.auth.server.documents.User;
-import apis.micro.auth.server.services.UserService;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,8 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import static io.jsonwebtoken.Header.TYPE;
 import static io.jsonwebtoken.Header.JWT_TYPE;
+import static io.jsonwebtoken.Header.TYPE;
 import static io.jsonwebtoken.JwsHeader.KEY_ID;
 
 @Service
@@ -36,8 +37,9 @@ public class JwtService {
 
     public String authenticateUserAndGenerateJwt(final String username, final String password) {
         Mono<User> userMono = userService.getUser(username);
-        if(userMono.blockOptional().isPresent()) {
-            passwordEncoder.matches(password, userMono.block().getPassword()); //TODO if matches then generate else raise Exception and return 401
+        if (userMono.blockOptional().isPresent()) {
+            //TODO if matches then generate else raise Exception and return 401
+            passwordEncoder.matches(password, userMono.block().getPassword());
             return generateToken(userMono.block());
         }
         return null; // TODO
@@ -55,6 +57,7 @@ public class JwtService {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
+
     private Claims extractAllClaims(String token) {
         return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
     }

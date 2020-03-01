@@ -4,7 +4,6 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.util.Base64URL;
 import net.minidev.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,43 +28,48 @@ public class KeyStoreUtil {
         KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(new FileSystemResource(filePath), password.toCharArray());
         return keyStoreKeyFactory;
     }
-    public static KeyPair jwtKeyPair(String filePath, String password, String alias){
+
+    public static KeyPair jwtKeyPair(String filePath, String password, String alias) {
         KeyPair keyPair = getKeyPair(filePath, password, alias);
         setDefaultKeyPair(keyPair);
         return keyPair;
     }
-    public static KeyPair getKeyPair(String filePath, String password, String alias){
+
+    public static KeyPair getKeyPair(String filePath, String password, String alias) {
         KeyPair keyPair = JwtKeyStoreKeyFactory(filePath, password).getKeyPair(alias);
         return keyPair;
     }
-    public static void setDefaultKeyPair(KeyPair kp){
+
+    public static void setDefaultKeyPair(KeyPair kp) {
         defaultKeyPair = kp;
         keyPairsMap.put("default-key-id", kp);
     }
-    public static void addKeyPair(KeyPair kp, String kid){
+
+    public static void addKeyPair(KeyPair kp, String kid) {
         keyPairsMap.put(kid, kp);
     }
-    public static KeyPair addKeyPair(String filePath, String password, String alias, String kid){
+
+    public static KeyPair addKeyPair(String filePath, String password, String alias, String kid) {
         KeyPair keyPair = getKeyPair(filePath, password, alias);
         keyPairsMap.put(kid, keyPair);
         return keyPair;
     }
-    public static KeyPair getDefaultKeyPair(){
+
+    public static KeyPair getDefaultKeyPair() {
         return defaultKeyPair;
     }
+
     public static Map<String, KeyPair> getKeyPairsMap() {
         return keyPairsMap;
     }
 
-    public static JSONObject getJwksJsonObject(){
-        if(jsonKeyObject == null) {
+    public static JSONObject getJwksJsonObject() {
+        if (jsonKeyObject == null) {
             List<JWK> keys = new ArrayList<>();
-            keyPairsMap.forEach((k,kp)->{
+            keyPairsMap.forEach((k, kp) -> {
                 RSAPublicKey publicKey = (RSAPublicKey) kp.getPublic();
-                logger.info("publicKey algo --> "+publicKey.getAlgorithm());
-                logger.info("publicKey pub expo --> "+ Base64URL.encode(publicKey.getPublicExponent()));
+                logger.info("publicKey algo --> " + publicKey.getAlgorithm());
                 RSAKey key = new RSAKey.Builder(publicKey)
-                        //.firstFactorCRTExponent(Base64URL.encode(publicKey.getPublicExponent()))
                         .keyID(k).keyUse(KeyUse.SIGNATURE).build();
                 keys.add(key);
             });
