@@ -1,11 +1,13 @@
 package apis.micro.auth.server.services;
 
 import apis.micro.auth.server.documents.User;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import apis.micro.auth.server.error.ErrorCodes;
+import apis.micro.auth.server.error.exceptions.AppRuntimeException;
+import apis.micro.auth.server.models.JwtAuthenticationRequest;
+import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -33,16 +35,26 @@ public class JwtService {
     @Qualifier("defaultKeyPair")
     KeyPair keyPair;
 
+    @Autowired
+    private Environment environment;
+
     private String SECRET_KEY = "secret";
 
-    public String authenticateUserAndGenerateJwt(final String username, final String password) {
-        Mono<User> userMono = userService.getUser(username);
+    public String authenticateUserAndGenerateJwt(final JwtAuthenticationRequest jwtAuthenticationRequest) {
+        // TODO validate if uername & password is null
+        // TODO if client is true, then get ClientMono, and validate accordingly
+
+        Mono<User> userMono = userService.getUser(jwtAuthenticationRequest.getUserName());
+
         if (userMono.blockOptional().isPresent()) {
-            //TODO if matches then generate else raise Exception and return 401
-            passwordEncoder.matches(password, userMono.block().getPassword());
-            return generateToken(userMono.block());
+            if(passwordEncoder.matches(jwtAuthenticationRequest.getPassword(), userMono.block().getPassword())) {
+                return generateToken(userMono.block());
+            } else {
+                throw new AppRuntimeException("Invalid username/password. Please re-enter.", ErrorCodes.UNAUTHORIZED);
+            }
+        } else {
+            throw new AppRuntimeException("User not found. Please register and try again.", ErrorCodes.NOT_FOUND);
         }
-        return null; // TODO
     }
 
     public String extractUsername(String token) {
@@ -62,9 +74,12 @@ public class JwtService {
         return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
     }
 
-    // TODO catch all JwtParser Runtime exceptions
-    public Claims extractMyClaims(String token) {
-        return Jwts.parser().setSigningKey(keyPair.getPublic()).parseClaimsJws(token).getBody();
+    public Claims validateJwtTokenAndGetClaims(String token) {
+        try {
+            return Jwts.parser().setSigningKey(keyPair.getPublic()).parseClaimsJws(token).getBody();
+        } catch (SignatureException | MalformedJwtException | UnsupportedJwtException | ExpiredJwtException ex) {
+            throw ex;
+        }
     }
 
     private Boolean isTokenExpired(String token) {
@@ -86,6 +101,7 @@ public class JwtService {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setIssuer(environment.getProperty("spring.application.name"))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
                 .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate())
                 //.signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();  // This is for Symmetric KeyPair

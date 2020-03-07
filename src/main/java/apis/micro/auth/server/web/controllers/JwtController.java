@@ -1,11 +1,14 @@
 package apis.micro.auth.server.web.controllers;
 
+import apis.micro.auth.server.models.JwtResponse;
+import apis.micro.auth.server.models.JwtAuthenticationRequest;
 import apis.micro.auth.server.services.JwtService;
 import io.jsonwebtoken.Claims;
 import net.minidev.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,18 +25,20 @@ public class JwtController {
     @Autowired
     JwtService jwtService;
 
-    /*
-    Return type = custome class JwtResponse
-    when we move to post mapping
-     */
+    @PostMapping("/api/jwt")
+    public JwtResponse generateJwt(@RequestBody JwtAuthenticationRequest jwtAuthenticationRequest) {
+        String token = jwtService.authenticateUserAndGenerateJwt(jwtAuthenticationRequest);
+        return generateJwtResponse(token, jwtAuthenticationRequest.getUserName());
+    }
 
-    @GetMapping("/api/jwt")
-    public String generateJwt(@RequestParam String username, @RequestParam String password) {
-        return jwtService.authenticateUserAndGenerateJwt(username, password);
+    private JwtResponse generateJwtResponse(String token, String username) {
+        return new JwtResponse()
+                .setToken(token)
+                .setUsername(username)
+                .setCode(HttpStatus.OK.value());
     }
 
     @GetMapping(value = {"/.well-known/jwks","/.well-known/jwks.json"}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    @ResponseBody
     public JSONObject getKey(HttpServletRequest request, HttpServletResponse response) {
         logger.info("JWKS being accessed!!!");
         return getJwksJsonObject();
@@ -41,6 +46,6 @@ public class JwtController {
 
     @GetMapping("/api/validate/jwt")
     public Claims validateAndGetClaims(@RequestHeader String jwt) {
-        return jwtService.extractMyClaims(jwt);
+        return jwtService.validateJwtTokenAndGetClaims(jwt);
     }
 }
