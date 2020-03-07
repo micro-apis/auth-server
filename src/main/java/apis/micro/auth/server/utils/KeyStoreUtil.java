@@ -24,11 +24,6 @@ public class KeyStoreUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(KeyStoreUtil.class);
 
-    public static KeyStoreKeyFactory JwtKeyStoreKeyFactory(String filePath, String password) {
-        KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(new FileSystemResource(filePath), password.toCharArray());
-        return keyStoreKeyFactory;
-    }
-
     public static KeyPair jwtKeyPair(String filePath, String password, String alias) {
         KeyPair keyPair = getKeyPair(filePath, password, alias);
         setDefaultKeyPair(keyPair);
@@ -36,8 +31,13 @@ public class KeyStoreUtil {
     }
 
     public static KeyPair getKeyPair(String filePath, String password, String alias) {
-        KeyPair keyPair = JwtKeyStoreKeyFactory(filePath, password).getKeyPair(alias);
+        KeyPair keyPair = jwtKeyStoreKeyFactory(filePath, password).getKeyPair(alias);
         return keyPair;
+    }
+
+    public static KeyStoreKeyFactory jwtKeyStoreKeyFactory(String filePath, String password) {
+        KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(new FileSystemResource(filePath), password.toCharArray());
+        return keyStoreKeyFactory;
     }
 
     public static void setDefaultKeyPair(KeyPair kp) {
@@ -70,7 +70,9 @@ public class KeyStoreUtil {
                 RSAPublicKey publicKey = (RSAPublicKey) kp.getPublic();
                 logger.info("publicKey algo --> " + publicKey.getAlgorithm());
                 RSAKey key = new RSAKey.Builder(publicKey)
-                        .keyID(k).keyUse(KeyUse.SIGNATURE).build();
+                        .keyID(k)
+                        .keyUse(KeyUse.SIGNATURE)
+                        .build();
                 keys.add(key);
             });
             jsonKeyObject = new JWKSet(keys).toJSONObject();
