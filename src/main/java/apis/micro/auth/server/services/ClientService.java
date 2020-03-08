@@ -1,6 +1,9 @@
 package apis.micro.auth.server.services;
 
 import apis.micro.auth.server.documents.Client;
+import apis.micro.auth.server.error.ErrorCodes;
+import apis.micro.auth.server.error.exceptions.AppRuntimeException;
+import apis.micro.auth.server.models.ClientRequest;
 import apis.micro.auth.server.repositories.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -10,7 +13,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 
 @Service
-public class ClientService {
+public class ClientService extends BaseService<Client> {
 
     @Autowired
     ClientRepository clientRepository;
@@ -18,15 +21,14 @@ public class ClientService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
-    public Mono<Client> createClient() {
+    public Mono<Client> createClient(ClientRequest clientRequest) {
         Client client = new Client()
-                .setClientId("api_1234")
-                .setClientSecret(passwordEncoder.encode("secret_1234"))
+                .setClientId(clientRequest.getClientId())
+                .setClientSecret(passwordEncoder.encode(clientRequest.getClientSecret()))
                 .setTokenValidity(LocalDateTime.now().plusDays(30))
                 .setDeleted(false)
                 .setEnabled(true);
 
-        Mono<Client> clientMono = clientRepository.save(client);
-        return clientMono;
+        return clientRepository.save(client).onErrorResume(handleMongoDbMonoErrors);
     }
 }

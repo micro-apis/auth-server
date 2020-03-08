@@ -26,7 +26,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
     private Environment environment;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String jwtToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (StringUtils.isEmpty(jwtToken)) {

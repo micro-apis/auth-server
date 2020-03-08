@@ -19,6 +19,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authorizationInterceptor())
-                .excludePathPatterns("/api/jwt", "/.well-known/jwks", "/.well-known/jwks.json", "/api/validate/jwt");
+                .addPathPatterns("/**")
+                .excludePathPatterns("/api/public/**", "/api/jwt", "/.well-known/**", "/api/validate/jwt");
     }
 }

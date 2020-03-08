@@ -1,5 +1,8 @@
 package apis.micro.auth.server.documents;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -17,6 +20,7 @@ import java.time.LocalDateTime;
 @Setter
 @Accessors(chain = true)
 @Document(collection = "user_profile")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserProfile implements Persistable {
 
     @Id
@@ -31,14 +35,17 @@ public class UserProfile implements Persistable {
     private String gender;
 
     @CreatedDate
+    @JsonFormat(pattern= "yyyy-MM-dd")
     private LocalDateTime created;
 
     @LastModifiedDate
+    @JsonFormat(pattern= "yyyy-MM-dd")
     private LocalDateTime updated;
 
     private Boolean deleted;
 
     @Override
+    @JsonIgnore
     public boolean isNew() {
         if(getCreated() == null)
             return true;

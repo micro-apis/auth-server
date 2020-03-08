@@ -8,10 +8,11 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class JwtAuthenticationRequest {
+public class ClientRequest {
 
-    private String userName;
-    private String password;
-    private Boolean client = Boolean.FALSE;
+    @JsonProperty("client_id")
+    private String clientId;
 
+    @JsonProperty("client_secret")
+    private String clientSecret;
 }
