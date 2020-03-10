@@ -17,22 +17,18 @@ Creating one package where we have one url to generate JWT based on certain fiel
 
 
 clients
-
 id  |  client_id   |    client_secret (encrypt, Bcrypt)   |    token_validity    | created | updated |  enabled | deleted
 
 
 users
-
 id  |  username   |    password (encrypt, Bcrypt)  | created | updated |  enabled | deleted | role_id |  user_profile_id
 
 
 roles
-
 id | role_name | created | updated | enabled | deleted 
 
 
 user_profile
-
 id | fname | lname | gender | created | updated | deleted
 
 
