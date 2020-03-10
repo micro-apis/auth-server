@@ -86,6 +86,11 @@ public class JwtService {
         return extractExpiration(token).before(new Date());
     }
 
+    public Mono<String> generateMonoToken(User userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        return Mono.just(createToken(claims, userDetails.getUserName()));
+    }
+
     public String generateToken(User userDetails) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, userDetails.getUserName());
